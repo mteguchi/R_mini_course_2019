@@ -1,0 +1,99 @@
+---
+title: "Introductory R mini course - Getting Started"
+author: "Tomo Eguchi"
+date: '`r Sys.Date()`'
+output: pdf_document
+---
+
+#About R and this workshop
+This is an introductory "class" on how to use R, which seems to be the industry standard for data analyses in ecological and statistical fields. The best thing about R is that it is absolutely free. It is updated regularly and many smart people are contributing to the R community to improve it. We, as R users, get to take advantage of the brain power. Some of you may turn into one of them after taking this workshop! 
+
+R is a high-level programming language. "High-level" means that you don't have to write your code in a machine language (low-level), which is understood by computers. We can write our instructions in an English-like language and R interprets them into a machine-language.  A machine language is operating system specific. Luckily, R comes in Windows, Mac, and Linux/Unix flavors so all of us can share our code without having communication issues among operating systems.  
+
+For this course, I expect that you have no or little experience with R or programming/coding. We will go through basics of writing code - logical thinking process - so that we can accomplish simple tasks using R. I will also sprinkle some basic statistical analyses and examples of data visualizations into this workshop. My hope is that you will find R to be an extremely useful tool in your scientific career. (well... you can use it for your personal life also, like loan calculations, exercise tracking, etc.) 
+
+I assume you have installed R and RStudio already.  If not, please do so by downloading R (https://www.r-project.org/) and installing it, followed by installing RStudio, which can be found here (https://www.rstudio.com/products/rstudio/download/). Again, you need to download the correct OS version for your computer. If R is already installed correctly, this should not cause any problems. 
+
+##Customizing RStudio
+Once you think you have installed R and RStudio, you can customize the appearance of RStudio by going into the Global Options menu under Tools.  It would be best to create an R working directory (folder) where all your R code and projects are stored.  Here is what mine looks like - it is a Windows computer but you can set up a similar folder in a Mac also.  
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/R_directory.png')
+```
+
+Once you have such a directory, you can tell RStudio to use it as your default root directory for all your future work.  "~" means the system specified working directory, e.g., C:/Users/tomo.eguchi/My Documents/ in my Windows system.  You can find this directory in your computer when you start a command window, such as this in Windows but Mac also has a similar one.
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/cmd.png')
+```
+
+And you can set your working directory in the general options setting menu.
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/GlobalOptionsGeneral.png')
+```
+
+You can also change how RStudio is set up using the Pane Layout menu.
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/PaneLayout.png')
+```
+
+To change the color scheme of your editor, you can use the Appearance menu. 
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/Appearance.png')
+```
+
+Once you tweaked your RStudio to your liking, please create a new project by clicking on the upper right corner of the screen. 
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/NewProject.png')
+```
+
+Followed by selecting "Empty Project":
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/EmptyProject.png')
+```
+
+Then, select a new directory:
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/NewDirectory.png')
+```
+
+Enter an appropriate directory name. Here it says "R_mini_course_2019". 
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/NewDirectoryName.png')
+```
+
+You should have created a new project in a new directory. All subsequent files related this project can be dropped into this folder. Here is what mine looks like:
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/ProjectExample.png')
+```
+
+As I mentioned earlier, many people contribute to data analyses using R. These contributions come in the form of libraries or packages. So, you can install desired packages to make your life easier.  One of the packages (well, it is a suite of packages) that we will use extensively is "tidyverse," which is designed for data manipulations and graphics.  Please install it by typing the following command at the R prompt (install.packages("tidyverse", dependencies = TRUE)):
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/install_tidyverse.png')
+```
+
+Once this is done, please run the test file ("R_Workshop.R"): Place the file into the newly created directory, in my case "C:/Users/tomo.eguchi/Documents/R/R_mini_course" and open it in RStudio then "source" it  (click on 'source' at the upper right corner of the code editor panel):
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics('images/FirstSourceExample.png')
+```
+
+You should see some summary statistics and a plot like this: 
+
+```{r turtle_R_workshop, echo=FALSE}
+source("R_workshop.R")
+```
+
+If you get warning or error messages, please let me know. If everything runs smoothly, you are all set! 
+
+If you are excited to get things started, I suggest going through examples in the attached document (SIOB-296 Intro to R Week 1.pdf). This is from Eric Archer's R class at SIO. You can find the entire class material here: https://github.com/EricArcher/Intro2R. 
+
