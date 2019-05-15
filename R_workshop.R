@@ -16,7 +16,7 @@ summary(lm1)
 df1$predict <- predict(lm1)
 
 
-plot(x, y)
+#plot(x, y)
 p1 <- ggplot(data = df1, aes(x = length)) +
   geom_point(aes(y = log(mass)),
              colour = "red",
@@ -26,4 +26,4 @@ p1 <- ggplot(data = df1, aes(x = length)) +
   xlab("Length (cm)") +
   ylab("ln(Mass) (kg)")
 
-p1
+print(p1)

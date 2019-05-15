@@ -1,0 +1,91 @@
+---
+title: "R configuration trick"
+author: "Tomo Eguchi"
+date: '`r Sys.Date()`'
+output: pdf_document
+---
+
+
+\section{A little trick for the future ease of package management
+(Windows)}\label{a-little-trick-for-the-future-ease-of-package-management-windows}
+
+If you are using Mac, I don't know how this would affect. You need to
+look around on the Internet when you have problems finding libraries.
+
+We'll use many different packages and they need to be updated
+frequently. When R comes out with a major update, libraries need to be
+found by R. They don't seem to have an automatic way of keeping track of
+libraries. I have been lazy not to add ``path'' information to the R
+startup. Now, I'm teaching how to use R, I thought it would be best to
+pass on this information so that you won't have to deal with the
+headache in the future. You may need your Administrator access.
+
+Open ``Control Panel''
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/Control_Panel1_a.png')
+```
+
+
+Select ``User Accounts''
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/User_Accounts_a.png')
+```
+
+Select ``Change my environment variables'' on the left-hand panel:
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/Enviro_Vars_a.png')
+```
+
+Click on "New..." on the top half, then type in "R\_LIBS\_USER"
+(without quotation marks) for "Variable name" and "%USERPROFILE%\\AppData\\Local\\R"
+for "Variable value" and click "OK":
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/Enviro_Vars2_a.png')
+```
+
+Then, create the folder (R) by going to the path, in my case
+"C:\\Users\\tomo\.eguchi\\AppData\\Local" and create a new folder and name it "R".
+
+You may not see this folder because it's hidden under the default setup of Windows. 
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/NoAppData.png')
+```
+
+To make it visible, you have to go change the setting. Go to the Control Panel and select "Appearance and Personalization"
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/Control_Panel3.png')
+```
+
+Then, select "Show hidden files and folders" under "Folder Options"
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/FolderOptions1.png')
+```
+
+Then, select "Show hidden files and folders". 
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/ShowHiddenFiles.png')
+```
+
+Then, you should be able to see it:
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/AppData.png')
+```
+
+Now create the folder (R) by going to the path, in my case
+"C:\\Users\\tomo\.eguchi\\AppData\\Local" and create a new folder and name it "R".
+
+```{r echo=FALSE, out.width='50%'}
+knitr::include_graphics('images/New_Folder_a.png')
+```
+
+You see an "R" folder already in the picture because I already had it.
+
