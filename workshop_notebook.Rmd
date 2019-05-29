@@ -1096,7 +1096,7 @@ library(viridis)
 
 # assign the destination to a variable - not necessary in this case but
 # just to show you another way to do the same task:
-infile <- 'data/WC_DC_Strandings_MAR2019.csv'
+infile <- 'data/WC_DC_Strandings_Mar2019.csv'
 
 dat0 <- read.table(infile, sep = ",", header = TRUE) 
 
