@@ -1,9 +1,9 @@
-#R_Workshop_June2017
+#R_Workshop_June2019
 
-# what we did in the workshop in June 2017
+# what we did in the workshop in June 2019
 
 # Tomo Eguchi
-# 28 June 2017
+# June 2019
 
 # clean the workspace before do anything
 rm(list=ls())
@@ -469,105 +469,105 @@ colnames(dat1.size) <- c('State', 'Year', 'Species_Code',
                          'Curved_Carapace_Length',
                          'Straight_Carapace_Length')
 
-if (internet){
-  West.coast <- get_map(location = c(lon = -138.0,
-                                     lat = 43.0),
-                        zoom = 4,
-                        maptype = "satellite",
-                        color = 'bw',
-                        source = 'google')
-  saveRDS(West.coast,
-          file = 'RData/CC_stranding_westcoast.rds')
+# if (internet){
+#   West.coast <- get_map(location = c(lon = -138.0,
+#                                      lat = 43.0),
+#                         zoom = 4,
+#                         maptype = "satellite",
+#                         color = 'bw',
+#                         source = 'google')
+#   saveRDS(West.coast,
+#           file = 'RData/CC_stranding_westcoast.rds')
+# 
+#   So.Cal <- get_map(location = c(lon = -119.0,
+#                                  lat = 33),
+#                     zoom = 7,
+#                     maptype = "satellite",
+#                     color = 'bw',
+#                     source = 'google')
+#   saveRDS(So.Cal,
+#           file = 'RData/CC_stranding_SoCal.rds')
+# } else {
+  # West.coast <- readRDS(file = 'RData/CC_stranding_westcoast.rds')
+  # SoCal <- readRDS(file = 'RData/CC_stranding_SoCal.rds')
+#   print('read from rds files')
+# }
 
-  So.Cal <- get_map(location = c(lon = -119.0,
-                                 lat = 33),
-                    zoom = 7,
-                    maptype = "satellite",
-                    color = 'bw',
-                    source = 'google')
-  saveRDS(So.Cal,
-          file = 'RData/CC_stranding_SoCal.rds')
-} else {
-  West.coast <- readRDS(file = 'RData/CC_stranding_westcoast.rds')
-  SoCal <- readRDS(file = 'RData/CC_stranding_SoCal.rds')
-  print('read from rds files')
-}
-
-map.west.coast <- ggmap(West.coast)
-map.So.Cal <- ggmap(So.Cal)
-
-p2 <-map.west.coast +
-  geom_point(data = dat1.size,
-             aes(x = Longitude, y = Latitude,
-                 color = Year),
-             size = 4) +
-  scale_color_viridis(discrete = TRUE,
-                      begin = 0.5, end = 1.0) +
-  xlab("Longitude") +
-  ylab("Latitude") +
-  theme(plot.title = element_text(hjust = 0.5),
-        legend.title = element_text(size = 10, hjust = 0.5),
-        legend.text = element_text(size = 8, vjust = 0),
-        legend.position = c(0.15, 0.4))
-
-dat.locs.So.Cal <- subset(dat1.size,
-                          Latitude < 34.45 & Longitude > -122)
-p3 <-   map.So.Cal +
-  geom_point(data = dat.locs.So.Cal,
-             aes(x = Longitude,
-                 y = Latitude,
-                 color = Year),
-             size = 3) +
-  scale_color_viridis(discrete = TRUE,
-                      begin = 0.5,
-                      end = 1.0) +
-  xlab("Longitude") +
-  ylab("Latitude") +
-  #ggtitle("Loggerhead turtles") +
-  theme(plot.title = element_text(hjust = 0.5),
-        legend.title = element_text(size = 10,
-                                    hjust = 0.5),
-        legend.text = element_text(size = 8,
-                                   vjust = 0),
-        legend.position = c(0.90, 0.6))
-
-dat.size <- na.omit(data.frame(Year = dat1.size$Year,
-                               CCL = dat1.size$Curved_Carapace_Length,
-                               state = dat1.size$State))
-p4 <- ggplot() +
-  geom_histogram(data = dat.size,
-                 aes(x = CCL),
-                 binwidth = 5,
-                 color = 'black',
-                 fill = 'white') +
-  xlab(expression(CCL[cm])) +
-  ylab('Frequency') +
-  ggtitle('USA') +
-  xlim(10, 100) +
-  # scale_x_discrete()
-  theme(axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 12))
-
-if (save.fig){
-  ggsave(filename = paste0('images/Cc_strandings_',
-                           Sys.Date(), '.png'),
-         plot = p1,
-         width = 8,
-         height = 7,
-         dpi = 1200)
-
-  ggsave(filename = paste0('images/Cc_strandings_westcoast_',
-                           Sys.Date(), '.png'),
-         plot = p2,
-         width = 9.4,
-         height = 8.4,
-         dpi = 1200)
-
-  ggsave(filename = paste0('images/Cc_strandings_SCB_',
-                           Sys.Date(), '.png'),
-         plot = p3,
-         width = 9.4,
-         height = 8.4,
-         dpi = 1200)
-
-}
+# map.west.coast <- ggmap(West.coast)
+# map.So.Cal <- ggmap(So.Cal)
+# 
+# p2 <-map.west.coast +
+#   geom_point(data = dat1.size,
+#              aes(x = Longitude, y = Latitude,
+#                  color = Year),
+#              size = 4) +
+#   scale_color_viridis(discrete = TRUE,
+#                       begin = 0.5, end = 1.0) +
+#   xlab("Longitude") +
+#   ylab("Latitude") +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         legend.title = element_text(size = 10, hjust = 0.5),
+#         legend.text = element_text(size = 8, vjust = 0),
+#         legend.position = c(0.15, 0.4))
+# 
+# dat.locs.So.Cal <- subset(dat1.size,
+#                           Latitude < 34.45 & Longitude > -122)
+# p3 <-   map.So.Cal +
+#   geom_point(data = dat.locs.So.Cal,
+#              aes(x = Longitude,
+#                  y = Latitude,
+#                  color = Year),
+#              size = 3) +
+#   scale_color_viridis(discrete = TRUE,
+#                       begin = 0.5,
+#                       end = 1.0) +
+#   xlab("Longitude") +
+#   ylab("Latitude") +
+#   #ggtitle("Loggerhead turtles") +
+#   theme(plot.title = element_text(hjust = 0.5),
+#         legend.title = element_text(size = 10,
+#                                     hjust = 0.5),
+#         legend.text = element_text(size = 8,
+#                                    vjust = 0),
+#         legend.position = c(0.90, 0.6))
+# 
+# dat.size <- na.omit(data.frame(Year = dat1.size$Year,
+#                                CCL = dat1.size$Curved_Carapace_Length,
+#                                state = dat1.size$State))
+# p4 <- ggplot() +
+#   geom_histogram(data = dat.size,
+#                  aes(x = CCL),
+#                  binwidth = 5,
+#                  color = 'black',
+#                  fill = 'white') +
+#   xlab(expression(CCL[cm])) +
+#   ylab('Frequency') +
+#   ggtitle('USA') +
+#   xlim(10, 100) +
+#   # scale_x_discrete()
+#   theme(axis.title.y = element_text(size = 12),
+#         axis.text.y = element_text(size = 12))
+# 
+# if (save.fig){
+#   ggsave(filename = paste0('images/Cc_strandings_',
+#                            Sys.Date(), '.png'),
+#          plot = p1,
+#          width = 8,
+#          height = 7,
+#          dpi = 1200)
+# 
+#   ggsave(filename = paste0('images/Cc_strandings_westcoast_',
+#                            Sys.Date(), '.png'),
+#          plot = p2,
+#          width = 9.4,
+#          height = 8.4,
+#          dpi = 1200)
+# 
+#   ggsave(filename = paste0('images/Cc_strandings_SCB_',
+#                            Sys.Date(), '.png'),
+#          plot = p3,
+#          width = 9.4,
+#          height = 8.4,
+#          dpi = 1200)
+# 
+# }

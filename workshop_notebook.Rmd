@@ -1,0 +1,1310 @@
+---
+title: "Workshop material in RStudio notebook"
+output: html_notebook
+---
+
+#Notebook
+This notebook feature in RStudio is quite handy. You can annotate your code in complete sentences and the entire document turns into an html document. In a similar fashion, you may create PDF or MS Word documents directly from RStudio using R Markdown - including figures and figure captions. This will eliminate copying and pasting results and plots when writing a document. When a new dataset is available, or find an error in your data, all you need to do is to fix your data and run the document (knit) in R. All corrections will be made simulataneously, including analyses, statistics in text, and figures. Apparently, you can also create litarature citation through Mendeley (a reference library application) but I have not looked into that yet. 
+
+R Markdown can produce HTML, PDF, and MS Word documents. More resources on R Markdown can be found at <http://rmarkdown.rstudio.com>. To create pdf documents, you will have to install Tex; for Windows, http://miktex.org, and use Net Installer to install the Complete version rather than Basic installation. For Mac OS X, check out http://tug.org/mactex/.  I have not tried the Mac version. 
+
+In the RStudio editor, you type plain text (note that there is no spell checker). When you want to insert a chunk of R code, you embed it using "backticks" like the following without the hash marks (#).  Ctrl-Alt-i will do the same: 
+
+```{r chunk_example1}
+#```{r chunk_example1}
+# "chunk_example1" is the identifier (name) of this chunk. Identifiers should 
+# be unique and cannot be repeated. 
+# your R code chunk here
+# ```
+```
+
+Of course, the previous chunk did not do anything because we did not put any code in there, except comment lines. A hash (#) is used to indicate a comment line in R. When you click on "Preview" button at upper left in RStudio, you will see that a Word or PDF document is created (I have not tested this on Mac computers). 
+
+To suppress comment lines, you add an option (echo=FALSE) between the curly brackets:
+
+{r echo=FALSE}
+```{r chunk_example2, echo=FALSE}
+#```{r chunk example2, echo=FALSE}
+# your R code chunk here
+# ```
+```
+
+As you see, nothing returned from the previous chunk. If you want to insert a piece of R code in your text, you can use the same approach without assigning an identifier. For example, you may want to insert 2+2/3-4\*exp(1.2)+log(10) = ```r 2 + 2/3 - 4 * exp(1.2) + log(10)```, which is difficult to compute without using a calculator (e.g., R). 
+
+Let's start talking about data analyses and coding. But first thing first... we need to have our data organized in a way that we can access them easily. We also need to have our stuff organized such that analyses can be repeated easily (i.e., reproducibility of analyses). 
+
+#Organizing files
+We all have different ways to organize our "stuff". I know some people who can find anything in piles of "stuff" in their office space. Others need to have more structure in their "stuff". When using computers, however, you need to accomodate how computers find files. Computers prefer a highly structured environment. So... like it or not, you need to work with the way they operate. 
+
+Regardless of your choice of operating system, i.e., Windows, Mac, Unix, Linux, ..., the basic structure is the same. In recent years, all OSs use user specific home directory structure. For example, my home directory in a Windows computer looks like this:
+
+```{r Libraries, echo=F, out.width = '400px'}
+knitr::include_graphics('images/libraries.png')
+```
+
+When you look at the complete path, it looks like this: "C:\\users\\t_e\\". And within that directory, I have several directories that contain different things, like music, pictures, documents, etc. Also note that Windows likes to use forward slashes (\\) whereas R likes to use back slashes (/) to separate directories.
+
+I suggest you create an R directory somewhere in this home directory. In my case, I created one under "My Documents", like so:
+
+```{r Direcotry, echo=F, out.width = '400px'}
+knitr::include_graphics('images/R_directory2.png')
+```
+
+In Mac OS, it may look like this:
+
+```{r MacPath, echo=F, out.width = '400px'}
+knitr::include_graphics('images/Mac_path_screenshot.jpg')
+```
+
+All my R projects (we'll talk about this soon), are saved in this directory. When I open this R folder (a.k.a., directory), you see these:
+
+```{r R_directory, echo=F, out.width = '400px'}
+knitr::include_graphics('images/inside_R_directory.png')
+```
+
+Each project has its own directory. When a project gets large, I even split it even further:
+
+```{r R_workshop_dir, echo=F, out.width = '400px'}
+knitr::include_graphics('images/R_directory3.png')
+```
+
+In this directory, I manually created RData, figures, maps, and data. The rest were created automatically by R. The RData folder contains some results of analyses that came out of R in the RData format - only R can read this format. In the figures folder, I have output figures from analyses. In the maps folder, I save files that create maps: GIS files.  In the data folder, all raw data are saved.  As you can see, this way, I have everything I need to conduct analyses for this project in this folder, including figures so that when writing a manuscript, I can go straight to this folder.  
+
+#Programming basics
+R is a high-level interpreted programming language. This means that you don't have to write code that gets compiled in your computer (this just means that it gets translated into a machine language). You write in a language that R can execute directly. Compiled languages need to be, well, compiled to each operating system. In R, you need to write code that R can understand and the rest is done in R. Some packages are written in compiled languages to make computations faster. You R code will run regardless of OS - so your code should run on your colleague's computer. 
+
+The basic idea of programming is to translate what you want to do to a step-by-step instruction for the computer. For example, if you want to add 1 and 3 in R, you would write 1 + 3 at your R console: > 1 + 3. Then you would get > ```r 1+3```. The console is handy for this type of one-off calculations, results on the console won't be saved automatically. If you want to do more complicated analyses, you need multiple lines of code, so it's best to create a script so that everything is in one place. (R Markdown goes one step further by putting analyses and report writing in one package!) Results, then can be saved to a file so you can bring them back the next time you work on it or when you need to upate your analyses as you collect more data. This is handy especially when computations take a long time to run. 
+
+For example, if you want to conduct a regession analysis on length and mass and plot the results, you will have to do the following steps:
+
+1. Import data
+2. Build statistical models on mass and length 
+3. Fit the models to the data
+4. Look at the results
+5. Plot the data and the best model
+
+Within each step, there may be multiple substeps (multiple lines of code). We'll go through examples of these steps later. 
+
+#R basics
+To get used to using R, we need to learn the basics; just like learning a new language. The syntax of each command can be found by looking up the help file; ">?*command_name*". For example, "?mean" will give you the help file for mean. Using RStudio, it shows up on one of the panels:
+
+```{r echo=F, out.width = '400px'}
+knitr::include_graphics('images/Help_mean.png')
+```
+
+If you didn't know the exact function name, you can use "??" at the prompt. For example if you are looking for a function to create pie charts, you may type "??pie". The best way to find answers to this kind of questions is to Google, e.g., "How to plot pie charts in R". 
+
+Warning: R help files are not very helpful sometimes. Also, you need to know R to understand the help files. I know it's painful sometimes. R help files are written by R programmers, so they can vary in their helpfulness. But there’s a large community of R users, and there are other good help sources where you can often find help: R Cheat Sheets or R Cookbook, and Google search. Stackoverflow has tons of answers for questions you'll inevitably have. I also recommend DataCamp (www.datacamp.com) - they have some great tutorials. 
+
+#Packages
+One of the strengths of R is the ability to utilize 'packages', or 'libraries.' A package/library is an extra set of functions, code, and data that expands the capability of base R, often written by scientists who needed some functionality that didn't yet exist within R. As of the mid December 2017, there are 11,979 packages on the R website (https://cran.r-project.org/). As of May 28, 2019, there are 14,304 packages.  Back in July 2017, there were 10,975 packages.  So, people are continuously developing packages. Packages are updated often also. These packages range in their topics from statistics, genomics, mapping, time-series analysis, geo-spatial analyses, satellite telemetry analyses, economics, data mining, and many more. The full list of available packages can be found here: https://cran.r-project.org/web/packages/. And... there are other packages that are not included in the website. Packages must be downloaded and installed - they are all free. You have installed "tidyverse" during the initial setup process.  
+
+install.packages("tidyverse")
+
+Before using a package, you need to "load" it into your workspace using the "library" command. For example, 
+
+library(tidyverse)
+
+Note you need to use quotation marks (single or double) when installing a package but no quotation marks are necessary (but can be used) when calling them into your environment.
+
+It would be best to load the only packages that you need in the current session to keep R efficient - all the files in packages are stored in the computer's memory. If you need just one or two functions from a package, you can use '::' to specify a package and function without loading the entire package. You have to have the package available locall; need to install it through install.packages() first. For example, assume you have installed the rgdal (this package is useful for conducting spatial analyses and reading/writing GIS files) and broom (this package is useful for housekeeping) packages. Then you can do something like this:
+
+```{r gis_example, echo=TRUE, warning=FALSE}
+rm(list=ls())
+library(rgdal)
+library(tidyverse)
+SDBay.gis <- spTransform(readOGR(dsn = "GISfiles/SDB_water",
+                                 layer = "sd_bay",
+                                 verbose = FALSE),
+                         CRS("+proj=longlat +datum=WGS84"))
+
+SDBay.df <- broom::tidy(SDBay.gis)
+
+water.gis <- spTransform(readOGR(dsn = "GISfiles/SDB_water",
+                                 layer = "water",
+                                 verbose = FALSE),
+                         CRS("+proj=longlat +datum=WGS84"))
+
+water.df <- broom::tidy(water.gis)
+
+eelgrass.2008 <- spTransform(readOGR(dsn = "GISfiles/eelgrass",
+                                 layer = "SD_Baywide_Eelgrass_2008",
+                                 verbose = FALSE),
+                         CRS("+proj=longlat +datum=WGS84"))
+eelgrass.2008.df <- broom::tidy(eelgrass.2008)
+
+eelgrass.2014 <- spTransform(readOGR(dsn = "GISfiles/eelgrass",
+                                 layer = "SD_Baywide_Eelgrass_2014_Final",
+                                 verbose = FALSE),
+                         CRS("+proj=longlat +datum=WGS84"))
+eelgrass.2014.df <- broom::tidy(eelgrass.2014)
+
+water.color <- "lightblue"
+background.color <- "darkgray"
+eelgrass.color <- "lightgreen"
+
+box.coords <- data.frame(lon = c(-117.145, -117.09, -117.09, -117.145, -117.145),
+                         lat = c(32.665, 32.665, 32.595, 32.595, 32.665))
+
+p.map.1.2008 <- ggplot() + 
+  geom_polygon(data = water.df,
+               aes(x = long, y = lat, group = group),
+               fill = water.color,
+               color = "black") +
+  geom_polygon(data = SDBay.df,
+               aes(x = long, y = lat, group = group),
+               fill = water.color,
+               color = "black") +
+  geom_polygon(data = eelgrass.2008.df,
+               aes(x = long, y = lat, group = group),
+               fill = eelgrass.color,
+               color = "darkgreen") +
+  geom_polygon(data = box.coords,
+               aes(x = lon, y = lat),
+               color = "black",
+               size = 1.2,
+               fill = NA) + 
+  coord_map(ylim = c(32.57, 32.75),
+            xlim = c(-117.27, -117.08)) + 
+  labs(x = "", y = "")+ 
+  theme(panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = background.color,
+                                        colour = background.color),
+        axis.text.x = element_text(angle = 90, vjust = 0.5))  
+
+print(p.map.1.2008)
+```
+
+I read GIS layers and made a map with eelgrass coverage in San Diego Bay in 2008. Similarly for 2014:
+
+```{r}
+p.map.1.2014 <- ggplot() + 
+  geom_polygon(data = water.df,
+               aes(x = long, y = lat, group = group),
+               fill = water.color,
+               color = "black") +
+  geom_polygon(data = SDBay.df,
+               aes(x = long, y = lat, group = group),
+               fill = water.color,
+               color = "black") +
+  geom_polygon(data = eelgrass.2014.df,
+               aes(x = long, y = lat, group = group),
+               fill = eelgrass.color,
+               color = "darkgreen") +
+  geom_polygon(data = box.coords,
+               aes(x = lon, y = lat),
+               color = "black",
+               size = 1.2,
+               fill = NA) + 
+  coord_map(ylim = c(32.57, 32.75),
+            xlim = c(-117.27, -117.08)) + 
+  labs(x = "", y = "")+ 
+  theme(panel.border = element_rect(color = "black", fill = NA),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = background.color,
+                                        colour = background.color),
+        axis.text.x = element_text(angle = 90, vjust = 0.5))  
+
+print(p.map.1.2014)
+```
+
+You can save these figures if you wish:
+```{r}
+ggsave(plot = p.map.1.2008,
+         filename = "figures/SanDiegoBay_Figure1_2008.png",
+         device = "png",
+         dpi = 600)
+
+ggsave(plot = p.map.1.2014,
+         filename = "figures/SanDiegoBay_Figure1_2014.png",
+         device = "png",
+         dpi = 600)
+```
+
+If you didn't have the directory, you will get an error message. When that happens, you can create the directory using Explorer (Windows), Finder (iOS), etc. You can also use "Terminal" within RStudio. 
+
+Packages get updated frequently. So, every once in a while, it is good to update the packages. RStudio makes things easier by having a drop-down menu item under the Tools option: Tools-Check for Package Updates... 
+
+#Understanding the difference between our eyes and computers (Curse of using Excel)
+Often times we use MS Excel as data manipulation software. Nothing is wrong with it and Excel is a fine tool for dealing with data (to a certain extent). However, we get carried away with what Excel does. For example, we may use colors and text to add "notes" to a dataset; "Growth data Nov 2008.xlsx" include green turtle size information from our green turtle study in San Diego Bay, California, U.S.A. When you open the file, you notice there are many empty cells. You also notice "200+" and "172.4\*" in the mass column. Computers are not good at separating different kinds of format; numbers and characters, for example. When it sees a character, everything else in the field (column) becomes characters. Imagine doing an arithmetic operation; 29 + 145\*.  We need to be aware that you use only one type of format in each field. (This rule also applies when you are dealing with databases.)
+
+Another thing to consider when using Excel as your data editor; make your data into a rectangle file, meaning all rows have the same number of columns. (You will see this example soon and find out how frustrating this can be.)
+
+#Data formatting
+When using Excel as the middle step to prepare your data for more advanced analyses (or send data to someone to do analyses), make sure that your dataset is suitable for the computer to understand. This is a tedious step but necessary. It makes us think hard about the data - more importantly it makes us more aware about how we enter data in the field.  
+
+To see how data entry can make a big difference in analyzing data, we load the original and cleaned up data into R, after converting them into text files. The first one is a tab-deliminted text file whereas the second one is a comma delimited. Although there is no rule and you can use anything as a delimiter (a character separating one entry from another in each row), I recommend using a comma after years of coding. A comma is hardly ever used for anything else, especially in the US (in some countries, they use commas where we use periods), and visually understandable. (There are always exceptions and you will see an exception soon.) A tab, on the other hand, can be confused with a space. Although you should avoid having spaces in your data. Lastly, if you know which data points are "offensive", "200+" and "172.4\*" in our example, we can assign NAs to these entries or fix them - the step of fixing or deleting should be recorded somewhere. 
+
+```{r CmData, cache=FALSE, echo=TRUE}
+# Using tabs as delimiter
+growth_data_1 <- read.table("data/Growth data Nov 2008.txt", 
+                            header = TRUE,
+                            sep = "\t")
+
+# Using commas as delimiter
+growth_data_clean <- read.table("data/Growth data Nov 2008 cleaned.csv", 
+                           header = TRUE,
+                           sep = ",")
+
+# treat ones with characters as NA - or missing values:
+growth_data_2 <- read.csv(file = 'data/Growth data Nov 2008.csv',
+                          na.strings = c('172.4*', '200+'))
+
+summary(growth_data_1)
+```
+
+Summary of growth_data_clean looks like this:
+```{r CmData_summary2, cache=FALSE, echo=TRUE}
+summary(growth_data_clean)
+
+```
+
+Summary of growth_data_2 looks like this:
+```{r CmData_summary3, cache=TRUE, echo=TRUE}
+summary(growth_data_2)
+```
+
+As you see, the weight variable has changed from a factor (a lot of levels corresponding to unique weight entries) in growth_data_1 to a numerical variable in growth_data_clean or growth_data_2. 
+
+A factor variable can be considered as a grouping variable. Within a factor, you have different "levels", for example, experimental treatments, size groups, age groups, nesting beaches, sex, etc. Often you would use integers or letters to define these levels. When using integers, you will have to specify it is a factor variable because R treats all numbers to be numerical variables. To specify a numeric variable is a factor variable, you use as.factor(). We'll see this example later. If you are using words, e.g., beach names, make sure to use identical spelling for each level. This includes upper and lower cases. For example, "Howicks" and "howicks" are treated differently. 
+
+(You probably noticed there are arrows (<-) and eqaul signs (=). You can use the equal sign in place of an arrow but not vice versa. I use arrows to be clear about the difference between "assign" and "equal".  You decide what you like...)
+
+When you bring a data file into R using read.table and its variants (e.g., read.csv), the data file becomes a data frame (R jargon). A data frame is an object, which contains variables, where each variable can be numeric, character, or factor.  To figure out what you have, you can use the str command, which displays the structure of an R object:
+
+```{r str_example, cache=FALSE, echo=TRUE}
+str(growth_data_clean)
+```
+
+As you see the data frame contains 215 observations (rows) with four variables; two factor (Turtle_ID and Date_Caught) and two numeric (SCL and Weight) variables. This str() function is useful for understanding what you have in each object. In RStudio, you can use the "Enivornment" tab: 
+
+```{r echo=F, out.width = '400px'}
+knitr::include_graphics('images/RStudio_Environment.png')
+```
+
+We can compute means of body mass (called Weight in these datasets) using "mean()".
+
+```{r CmDataAnalysis1, cache=FALSE, echo=TRUE}
+mean(growth_data_1$Weight)
+mean(growth_data_clean$Weight)
+```
+
+Both return "NA" because R does not like to compute summary statistics when there are "NA"s in your data.  To compute summary statistics ignoring NAs, we add an option: "na.rm = TRUE", or equivalently "na.rm = T".
+
+```{r CmDataAnalysisNoNA, cache=FALSE, echo=TRUE}
+mean(growth_data_1$Weight, na.rm = TRUE)  # still NA because... 
+mean(growth_data_clean$Weight, na.rm = T)
+```
+
+This NA issue is a something to consider when your data contain one or more empty entries (they all become NAs in R). 
+
+The best practice is to enter NA in your data file _before_ importing to R. Be explicit!
+
+Also you may have noticed the spaces in the header line have been converted into periods.  You want to keep your header names to be distinctive, representative, and succinct.  R (and many other programming languages) is case sensitive. So, it's good to get your own habit of mixing lower and upper cases. For example, you may use an uppercase letter for the first letter of each word to eliminate spaces, e.g., TurtleIdTag, DateCaught, etc. Finally, avoid including parentheses with units; this information can be stored into a meta file, e.g., another Excel sheet or included in variable names, separated by an underscore, e.g., "Weight_kg".  
+
+#Script
+(For this workshop, I decided to skip this section as we use Notebook instead.)
+Let's create a script to conduct the regression analysis discussed earlier. In this scipt, we will 1. Import data, 2. Build statistical models on mass and length, 3. Fit the models to the data, 4. Look at the results, and 5. Plot the data and the best model. 
+
+File - New File - R Script or the new file icon on top left to create a new R script file. 
+
+```{r echo=FALSE, out.width='400px'}
+knitr::include_graphics('images/CreateScript.png')
+```
+
+You should have "Untitled1" created. One thing we should always do is to anotate our code. We will forget what we have done within a few weeks (trust me...). I copied and pasted the five steps into this file, then added "#" at the begining of each line. In R, lines that start with "#" is treated as comment lines. In RStudio, you can use ctrl-Shift-C or Code - Comment/Uncomment Lines. 
+
+```{r echo=FALSE, out.width='400px'}
+knitr::include_graphics('images/NewScript_1.png')
+```
+
+To save space on this document, I'll start inserting R code in the document without having screen shots. Colors and fonts are different when R code chunks are shown. 
+
+We will fill between the lines with necessary R code. Save it as a ".R" file. You can run an entire script file by "sourcing" it (click on "source" at the middle center). Alternatively, you can type "source('your\_file\_name.R')" at the command prompt. To execute just a line or several lines, you can select the lines then either click on "Run" at the top middle, copy the selected lines and paste it at the command prompt (multiple lines can be pasted), or Ctrl-Enter (quickest). If you assign output to a variable, results will be stored in the variable. When you type the variable name at the prompt, you will see part of the results. 
+
+#Reading data
+```{r getDataIn, echo=TRUE}
+# 1. Import data
+growth_data_clean <- read.table("data/Growth data Nov 2008 cleaned.csv", 
+                                header = TRUE,
+                                sep = ",")
+```
+
+In R, a basic format of data is called "data frame". A data frame is a very convenient object because each column can be extracted using the column name (and among other reasons). To look at what column/variable names are available, 
+
+```{r dataFrame1, echo=TRUE}
+names(growth_data_clean)
+```
+
+You can assign the names to an object:
+
+```{r dataFrame2, echo=TRUE}
+varNames <- names(growth_data_clean)
+str(varNames)
+```
+
+"varNames" is a vector of characters with four elements.
+
+To look at first several lines of the data file, 
+
+```{r headExample, echo=TRUE}
+head(growth_data_clean)
+```
+
+Note that results came back to the console because we didn't assign anything to the output of "head." You can change the number of lines that return from the head function by providing the second input (type ?head at the prompt (>) on the console for more details). 
+
+```{r headExample2, echo=TRUE}
+head(growth_data_clean, n=3)
+```
+
+We also have "tail":
+```{r tailExample1, echo=TRUE}
+tail(growth_data_clean, n=5)
+```
+
+To see a summary of the data
+
+```{r summary1, echo=TRUE}
+summary(growth_data_clean)
+```
+
+You may want to see summary statistics of just one column, say the third column:
+
+```{r summary2, echo=TRUE}
+summary(growth_data_clean[,3])
+```
+
+Equivalently, if you know the variable name, you can do:
+
+```{r summary3, echo=TRUE}
+summary(growth_data_clean[, 'SCL'])
+```
+
+These summary statistics can be useful in finding errors in your data. You can look for extreme values and NAs (should they be there?). 
+
+In R, data frames and matrices are indexed by row, column, and other dimensions. So, [3,5] indicates row 3 and column 5. If you want to select the entire row or column, leave that space empty; [3,] for all columns of the third row and [,2] for all rows of the second column. You can also select multiple columns by combining numbers, e.g., [2, 1:4] for the second row and columns 1 through 4, [3, c(1, 3, 5)] for the third row and 1st, 3rd, and 5th columns. The "c" operator is used in R to combine multiple items. 
+
+You can also use column names if you are using a data frame. For example, if you want to see the third entry of 'Date_Caught' in growth_data_clean,
+
+```{r dataframe_index1, echo=TRUE}
+growth_data_clean[3, 'Date_Caught']
+```
+
+The same thing can be accomplished by using the column name, preceded by '$':
+
+```{r summary4, echo=TRUE}
+growth_data_clean$Date_Caught[3]
+```
+
+Note that in the above example, the indexing only had one number. This is because the '$' operator extracted just one column ('Date_Caught') so we are just looking at a vector at this point.
+
+```{r summary4.1, echo=TRUE}
+growth_data_clean$Date_Caught
+```
+
+#subset
+Another useful function with respect to data frame is "subset". It is used to extract "subset" of your data frame. For example, you may want to look at turtles that are longer than 60 cm SCL. 
+
+```{r summary5, echo=TRUE}
+largeTurtles <- subset(growth_data_clean, SCL > 60)
+summary(largeTurtles)
+```
+
+In the first line, I extracted all SCL > 60 cm and stored them into a new object (largeTurtles), then looked at the summary of the selected. This could have been accomplisehd in one line:
+
+```{r summary6, echo=TRUE}
+summary(subset(growth_data_clean, SCL > 60))
+```
+
+The inside function is executed first. Be careful making things complicated by combining multiple commands in one line. Unless you are 100% sure what's happening at each step, it's best to separate them into different lines first. That way, you can check what's happening at every step. Also, you will not be able to save the intermediate steps for later use. 
+
+You may have noticed there were 140 (Other) Turtle_ID "levels" when we looked at the summary of the subset (largeTurtles). Were there that many turtles that were >60 cm? Take a look at the size of this variable. "dim" function gives you the size (or dimensions) of an array or data frame. 
+
+```{r summary8, echo=TRUE}
+dim(largeTurtles)
+```
+
+The number of rows is provided first, followed by the number of columns. How many did we have to begin with?
+
+```{r summary9, echo=TRUE}
+dim(growth_data_clean)
+```
+
+Let's make sure we are not fooled by R. Make a histogram of SCL and find the smallest values for largeTurtles and datCmCleaned
+
+```{r summaryPlot1, echo=TRUE}
+hist(largeTurtles$SCL, 
+     xlab = "SCL (cm)", 
+     main = "Turtles > 60cm SCL")
+min(largeTurtles$SCL, na.rm=T)
+min(growth_data_clean$SCL, na.rm=T)
+```
+
+Now we know what subset did and trust the results! (You don't have to go through these steps every time you have new data - but these are steps I take to make myself satisfied sometimes.)
+
+Note, however, we know that some turtles were caught multiple times over years.  So, you may want to look at how many times each turtle was caught and how it increased in size. To extract just one turtle, you can use "==", for example; 
+
+```{r summary10, echo=TRUE}
+turtle3030 <- subset(growth_data_clean, 
+                     Turtle_ID == "3030")
+turtle3030
+```
+
+Equivalently, but with a few more key strokes:
+```{r summary11, echo=TRUE}
+turtle3030 <- growth_data_clean[growth_data_clean$Turtle_ID == "3030",]
+turtle3030
+```
+
+Even though "3030" seems like a number, it is stored as a string of characters in the data frame (confirm this by str(growth_data_clean)). Consequently, I used the quotation marks around 3030. It turned out the turtle was caught 9 times over the years. 
+
+We can look at how it grew over time. Let's see if we can plot this. Now I'm going to introduce another package, "ggplot2", which has many more functionalities than the plot function in the base R package. 
+
+```{r plot_turtleGrowth, echo=TRUE}
+library(ggplot2)   # if not installed, install.packages("ggplot2") first. 
+ggplot(data = turtle3030) + 
+  geom_point(aes(x = Date_Caught, y = SCL)) + 
+  labs(x = "Date", y = "SCL (cm)")
+
+```
+
+It doesn't look so good, does it? Note Date_Caught is in the mm/dd/yyyy format and R doesn't seem to understand it. We need to tell R the column should be read as dates, rather than character strings. 
+
+#Dealing with dates
+
+We create a new variable "Date" using the as.Date function.  It requires what kind of format the dates are in; "format = '%m/%d/%Y'" specifies the date format in the input file. You may have a different format if you are using a Mac computer. See help for "as.Date" or "strptime" to find the appropriate format. For example, if years were coded with the two-digit format, e.g., 02 for 2002, the format statement would look like '%m/%d/%y'. 
+
+There is a packaged called "lubridate", which makes working with dates and time easier.  
+
+```{r plot_turtleGrowth2, echo=TRUE}
+library(lubridate)
+turtle3030$Date <- as.Date(turtle3030$Date_Caught, 
+                            format = "%m/%d/%Y")
+ggplot(data = turtle3030) + 
+  geom_point(aes(x = Date, y = SCL)) + 
+  geom_line(aes(x = Date, y = SCL), na.rm = T) + 
+  labs(x = "Date", y = "SCL (cm)")
+
+```
+
+That looks a lot better! However, you noticed there is a large gap between sometime in 2001 and 2002. What caused that? When you look at the data (turtle3030), you notice there is an NA in SCL for 2/28/2001. Somehow data were not collected on that day! To ignore this, you can interpolate to enter a data point in the missing place or re-define the data frame without the missing data point. I don't like making up data points so I will show you the second option here 
+
+```{r plot_turtleGrowth3, echo = TRUE}
+turtle3030 <- filter(turtle3030, !is.na(SCL))
+ggplot(data = turtle3030) + 
+  geom_point(aes(x = Date, y = SCL)) + 
+  geom_line(aes(x = Date, y = SCL), na.rm = T) + 
+  labs(x = "Date", y = "SCL (cm)")
+
+```
+
+This effectively linearly interpolates data without adding a "point" in the plot. If you insist... I will also introduce another tool "tidyverse", which is a combination of packages (ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr, forcats; https://www.tidyverse.org/) to deal with data manipulations. This package also allows you to use pipes (from magrittr package as part of dplyr) to send output from one line to the next. It's easier to understand how this works through an example:  
+
+```{r plot_turtleGrowth4, echo=TRUE}
+
+# rebuild a data frame for Turtle 3030:
+growth_data_clean %>% subset(Turtle_ID == "3030") %>%
+  mutate(Date = as.Date(Date_Caught, format = "%m/%d/%Y")) -> turtle3030
+
+# we need to figure out how many days in between each meaasurement:
+turtle3030 <- mutate(turtle3030, NumDays = Date - Date[1])
+
+# Let's go through this one step at a time. First get the SCLs
+known_SCLs <- filter(turtle3030, 
+                     Date == as.Date("2002-03-20") |
+                       Date == as.Date("2001-01-25"))
+
+dif_SCL <- known_SCLs[2, 'SCL'] - known_SCLs[1, "SCL"]
+
+# next the number of days between the two observations:
+dif_days <- known_SCLs[2, 'Date'] - known_SCLs[1, "Date"]
+
+# how many days since the first observation to the missing observation?
+dif_days2 <- turtle3030[3, "Date"] - as.Date("2001-01-25")
+
+growth <- as.numeric(dif_days2) * dif_SCL/as.numeric(dif_days)
+
+interp_SCL <- turtle3030[2, "SCL"] + growth
+
+#If you wish, you can insert the number into the data frame:
+turtle3030[3, "SCL"  ] <- interp_SCL
+
+ggplot(data = turtle3030) + 
+  geom_point(aes(x = Date, y = SCL)) + 
+  geom_line(aes(x = Date, y = SCL), na.rm = T) + 
+  labs(x = "Date", y = "SCL (cm)")
+```
+
+I'm not sure if this was worth computing... But! We learned a lot of R commands along the way. Also, there are many other (more elegant) ways to get this task completed. 
+
+Now you may be thinking "how can we count how many times each turtle was caught?" How do we do that? 
+
+#More on pipes (%>%) in dplyr
+Using dplyr, we go through data manipulations one step at a time using an operator called a "pipe": %>%  You pass things along using the pipe operator from left to right.
+
+For example, you may be interested in just larger turtles, so we extract large turtles first and then find out how many times each one was caught:
+
+```{r dplyr_example1, echo=TRUE}
+growth_data_clean %>% filter(., SCL>60) %>% count(., Turtle_ID)
+
+```
+
+I used a dot in the first input to filter because that's where growth_data_clean should be (a place holder). The same can be done as following:
+
+```{r dplyr_example1.1, echo=TRUE}
+growth_data_clean %>% filter(SCL>60) %>% count(., Turtle_ID)
+# or 
+growth_data_clean %>% filter(SCL>60) %>% count(Turtle_ID)
+```
+
+The pipe operator puts the left hand side variable into the first input in the right hand side. The output of filter is now placed into the dot in count. 
+
+You can store the results into a new variable:
+
+```{r dplyr_example2, echo=TRUE}
+n_caught1 <- filter(growth_data_clean, SCL>60) %>% count(., Turtle_ID)
+```
+
+Equivalently, ...
+
+```{r dplyr_example2.1, echo=TRUE}
+growth_data_clean %>% filter(., SCL>60) %>% count(Turtle_ID) -> n_caught2
+```
+
+However, when you are not using pipes, you cannot omit the first input. For example, filter(SCL>60) would return an error message. Pipes (%>%) connect commands in order that you would run functions separately without leaving intermittent objects or separating them into multiple lines. For example, the previous chunk can be split into three lines:
+
+```{r pipe_example1, echo=TRUE}
+# assign intermediate steps into a temporary object (tmp):
+tmp <- filter(growth_data_clean, SCL > 60)
+tmp <- count(tmp, Turtle_ID)
+n_caught3 <- data.frame(tmp)
+
+# Alternatively, you can just put the whole thing in one line also. Functions are evaluated from inside. 
+n_caught4 <- data.frame(count(filter(growth_data_clean, 
+                                    SCL > 60), 
+                             Turtle_ID))
+
+```
+
+There is nothing wrong with the above approaches - you can choose which ever fits your thought process best. The second approach (using three lines) is useful when you want to check the intermediate steps. 
+
+#NAs
+Some analytical tools don't like missing values, or NAs. We can eliminate all rows with at least one NA by using na.omit:
+
+```{r summary12, echo=TRUE}
+datCmNoNA <- na.omit(growth_data_clean)
+summary(datCmNoNA)
+dim(datCmNoNA)
+```
+
+Many rows were removed by having at least one NA. A quiz; how did I figure out the number? 
+
+Speaking of NAs, sometimes, you want to know where NAs occur in your data. For example, you may want to know which turtles didn't have SCL measurements. There is a function to find where NAs occur; is.na. "is.na" will return TRUE and FALSE depending on whether or not each entry is an NA. For example,
+
+```{r isna1, echo=TRUE}
+is.na(growth_data_clean[1,])
+```
+
+To select turtles with no SCL measurements, first we find which ones have NAs in SCL, then select the IDs that correspond to is.na == TRUE:
+
+```{r isna2, echo=TRUE}
+idxNA <- is.na(growth_data_clean$SCL)
+idSclNA <- growth_data_clean$Turtle_ID[idxNA]
+```
+
+Of course, you could have done that in one line. Noting that the left hand side (LHS) and right hand side (RHS) of an arrow is identical, i.e., idxNA is the output of  is.na(growth_data_clean$SCL), you can replace idxNA in the second line with the RHS of the first line: 
+
+```{r isna3, echo=TRUE}
+idSclNA <- growth_data_clean$Turtle_ID[is.na(growth_data_clean$SCL)] 
+```
+
+Here, we used TRUE/FALSE as an index to select which ones to pick.    
+
+```{r isna4, echo=TRUE}
+length(idSclNA)
+idSclNA
+```
+
+What if you want to select those that were not NA in SCL? We use the "not" operator (!):
+
+```{r isna5, cache=FALSE, echo=TRUE}
+idxNotNA <- !is.na(growth_data_clean$SCL)
+idSclNotNA <- growth_data_clean$Turtle_ID[idxNotNA]
+#idSclNotNA # I don't show this because there are so many. 
+```
+
+#Factor variables
+As I mentioned earlier, factor variables are often used to categorize data, e.g., species, sex, age/size classes, etc. In this example, we'll make a factor variable to designate small and large turtles; small turtles (<60cm) gets level 1 and large turtles (>= 60 cm) gets level 2. You can use 'small' and 'large' if you wish. First we create an empty vector of a correct length, enter 1s and 2s in appropriate places, then convert the vector into a factor while putting it into the data frame. (A clunky way.)
+
+```{r asFactor1, echo=TRUE}
+growth_data_clean <- read.table("data/Growth data Nov 2008 cleaned.csv", 
+                                header = TRUE,
+                                sep = ",") 
+
+# create a new vector - nrow() is a function that counts the number of rows
+temp_vector <- vector(mode = "integer", 
+                      length = nrow(growth_data_clean))
+
+# put 1s and 2s into the appropriate places:
+temp_vector[growth_data_clean$SCL < 60] <- 1
+temp_vector[growth_data_clean$SCL >= 60] <- 2
+
+# make sure NAs stay NAs
+temp_vector[is.na(growth_data_clean$SCL)] <- NA
+
+# Then put it in to the data.frame while converting it into a factor
+growth_data_clean$size <- as.factor(temp_vector)
+str(growth_data_clean)
+```
+
+Alternatively, you can make a vector of 1s first to save some key strokes:
+
+```{r asFactor2, echo=TRUE}
+growth_data_clean <- read.table("data/Growth data Nov 2008 cleaned.csv", 
+                                header = TRUE,
+                                sep = ",") %>%
+  mutate(Date = as.Date(Date_Caught, format = "%m/%d/%Y"))
+# create a new vector with 1s (dim() provides the numbers of rows and columns)
+temp_vector <- rep(1, times = dim(growth_data_clean)[1])
+
+# put 2s into the appropriate places:
+temp_vector[growth_data_clean$SCL >= 60] <- 2
+
+# make sure NAs stay NAs
+temp_vector[is.na(growth_data_clean$SCL)] <- NA
+
+# Then put it in to the data.frame while converting it into a factor
+growth_data_clean$size <- as.factor(temp_vector)
+str(growth_data_clean)
+```
+
+As we discussed many times, there are many ways to accomplish one task. The new vector can be defined first in the dataframe. What if we want to make three size classes; large (3), medium (2), and small (1)?  "mutate" is a functino in dplyer package. if_else(test, a, b) is a function also in dplyr that evaluates the first test argument and returns the second argument (a) if the test is true but returns the third argument (b) if it is false. In this case, I nested the ifelse() functions, so that when the first test (SCL>90) is false, it tests the second test (SCL <= 90 & SCL > 60). There also is ifelse() on the base package. if_else() is supposed to be a bit faster (see ?if_else).
+
+```{r alternativeWays, echo=TRUE}
+# one way to assign size classes
+# many ways to do these tasks...
+# Create a new variable Size.Class then assign values accordingly:
+growth_data_clean %>% mutate(Size.Class = if_else(SCL > 90, 3, 
+                                                 if_else(SCL <= 90 & SCL > 60, 2, 1))) -> growth_data_clean
+
+```
+
+Please note the difference between Size.Class and size variables. The former is a numeric vector with 1s, 2s, and 3s, whereas the latter is a factor variable with two levels; 1 and 2. Depending on what you want to do with the size class variable, you have to make it either factor or numeric variable. I know it makes no sense to you now... but just keep in mind (factor vs. numeric).
+
+If you wanted to compute summary statistics grouped by a variable (e.g., turtle ID), you can do so easily using summarize (or summarise) function in dplyr. You need to group your data frame by a grouping variable (or more than one) first.
+
+```{r summary_with_groups, echo=TRUE}
+growth_data_clean %>% group_by(Turtle_ID) %>% 
+  summarize(meanSCL = mean(SCL), 
+            meanMass = mean(Weight), 
+            firstSCL = first(SCL), 
+            firstMass = first(Weight),
+            lastSCL = last(SCL), 
+            lastMass = last(Weight),
+            firstDate = first(Date), 
+            lastDate = last(Date)) -> stats_growth_data
+
+```
+
+#Outliers
+Outliers are difficult to deal with. They may be true extreme values. Or, they may be results of transcription errors. These data points throw off statistical analyses. They should not be removed without some serious considerations. Here, however, we use outliers as an example to practice removing some data points from a data frame.
+
+While we are learning how to remove outliers, we also practice using the ggplot2 package. You need to learn the "grammar" of the package - define a dataframe, provide x and y in aes() (or aesthetic) and make layers:
+
+```{r outlierRemoval, echo=T, warning=FALSE}
+p2 <- ggplot(data = stats_growth_data,
+             aes(x = firstSCL, 
+                 y = firstMass)) +
+  labs(x = "SCL (cm)", y = "Mass (kg)")+
+  geom_point()
+
+p2
+```
+
+Can we select outliers using filter in dplyr?
+
+```{r outlierRemoval_2, echo=T}
+stats_growth_data %>% filter((firstSCL < 50 & firstMass > 50) |
+                               (firstSCL < 75 & firstMass > 95) | 
+                               firstSCL > 110) -> out.liers
+
+```
+
+Then we can mark those in the plot:
+
+```{r outlierRemoval_3, echo=T}
+p3 <- ggplot() +
+  labs(x = "SCL (cm)", y = "Mass (kg)")+
+  geom_point(data = stats_growth_data,
+             aes(x = firstSCL, 
+                 y = firstMass)) + 
+  geom_point(data = out.liers,
+             aes(x = firstSCL,
+                 y = firstMass),
+             shape = 1, color = 'red', 
+             size = 5)
+
+p3
+```
+
+After much discussion with your colleagues, you decided to take out those data points from your data for the further analyses. How do we delete those data points from the original dataset? 
+
+We can figure out the IDs of these turtles by looking at the out.lier data frame. These are "1304", "13581", "LB-382", and "X-129_X-130". The original data frame (growth_data_clean) also contained "Turtle_ID" field. So, we want to remove lines with these IDs. There are some useful functions in dplyr; inner_join(), left_join(), right_join(), semi_join(), anti_join(), and full_join(). We want to have all rows in growth_data_clean where Turtle_ID does not match with those in Turtle_ID of out.liers. (Complicated!)
+
+```{r outlierRemoval_4, echo=TRUE}
+# we use anti_join for this kind of extraction:
+growth_data_clean_1 <- anti_join(growth_data_clean, 
+                                 out.liers, 
+                                 by = "Turtle_ID")
+
+# do you believe what was done here?
+p4 <- ggplot() +
+  labs(x = "SCL (cm)", y = "Mass (kg)")+
+  geom_point(data = growth_data_clean_1,
+             aes(x = SCL, 
+                 y = Weight))+ 
+  geom_point(data = out.liers,
+             aes(x = firstSCL,
+                 y = firstMass),
+             shape = 1, color = 'red', 
+             size = 5)
+p4
+
+```
+
+It worked! 
+
+We can also use outlier statistics to find which data points are outliers. One such statistic is called Cook's distance, which measures how each data point influences the predicted response variables. We can fit a linear model and compute Cook's distance:
+
+```{r CooksDistance, echo=TRUE}
+growth_data_clean <- read.table("data/Growth data Nov 2008 cleaned.csv", 
+                                header = TRUE,
+                                sep = ",")
+
+# create a linear model data frame - extract SCL and Weight, then remove
+# rows with NAs (na.omit())
+lm.data <- na.omit(select(growth_data_clean, SCL, Weight))
+
+# fit a linear model
+fit.lm1 <- lm(Weight ~ SCL, data = lm.data)
+
+# plotting the output will get you diagnostic plots: 
+plot(fit.lm1)
+
+# extract just Cook's distance:
+cooksD <- cooks.distance(fit.lm1)
+plot(cooksD)
+```
+
+Index corresponds to sequential numbers from the first to the last entry, so we can combine raw data and Cook's distances and plot as we wish
+
+```{r}
+lm.data$CooksD <- cooksD
+lm.data$Index <- seq(from = 1, to = nrow(lm.data))
+
+p5 <- ggplot(data = lm.data) + 
+  geom_point(aes(x = Index,
+                 y = CooksD)) + 
+  labs(x = "Index", y = "Cook\'s distance")
+
+p5
+```
+
+
+The residual plots did not look so linear... so try ln(Weight)
+
+```{r CooksDistance2, echo=TRUE}
+# Does a ln(Weight) vs. SCL fit better? (Yes)
+lm.data$lnWeight <- log(lm.data$Weight)
+fit.lm2 <- lm(lnWeight ~ SCL, data = lm.data)
+plot(fit.lm2)
+cooksD2 <- cooks.distance(fit.lm2)
+plot(cooksD2)
+
+```
+
+We can merge this output to the data frame (growth_data_clean) and make a plot, color coded by Cook's distance  values:
+
+```{r CooksDistance3, echo=TRUE}
+lm.data$CooksD <- cooksD
+lm.data$CooksD2 <- cooksD2
+
+p1 <- ggplot() + 
+  geom_point(data = lm.data,
+             aes(x = SCL, 
+                 y = Weight, 
+                 color = CooksD)) + 
+  labs(x = "SCL (cm)", y = "Mass (kg)") + 
+  scale_color_gradient(low = 'blue', high = 'red')
+p1
+```
+
+
+```{r CooksDistance4, echo=TRUE}
+p2 <- ggplot() + 
+  geom_point(data = lm.data,
+             aes(x = SCL, 
+                 y = lnWeight, 
+                 color = CooksD2)) + 
+  labs(x = "SCL (cm)", y = "log(Mass (kg))") + 
+  scale_color_gradient(low = 'blue', high = 'red')
+p2
+
+```
+
+You may remove one at a time, say the largest Cook's distance until you find data look okay. 
+
+```{r removingOutliers, echo=TRUE}
+# remove the most offensive one
+lm.data %>% filter(., CooksD2 < max(CooksD2)) -> lm.data
+fit.lm3 <- lm(lnWeight ~ SCL, data = lm.data)
+
+lm.data$yhat <- predict(fit.lm3)
+p3 <- ggplot(data = lm.data) + 
+  geom_point(aes(x = SCL, 
+                 y = lnWeight, 
+                 color = CooksD2)) + 
+  geom_line(aes(x = SCL, y = yhat),
+            size = 2) +
+  labs(x = "SCL (cm)", y = "log(Mass (kg))") + 
+  scale_color_gradient(low = 'blue', high = 'red')
+p3
+```
+
+It may be good to go through the same exercise a couple more times to remove a few more offensive data points. Alternatively, using the previous plot, you may exclude all data points with Cook's distance > 0.1. How would you do that? 
+
+There is a package called "outliers" that contains many functions that can be used to identify extreme values. (I have never used it... I probably should.)
+
+#Plotting figures
+As you just witnessed above, ggplot2 is a powerful plotting library. You can overlay plots easily. 
+
+R provides basic plotting options, which are publication quality. In recent years, however, the ggplot package (ggplot2) has gained some momentum. It has many options but the learning curve is a little steep.  **A lot** of information is available online on plotting in R. I search Google many times every day to get things done right. If you have a question, it is very likely someone has asked the same question in the past. 
+
+There are two primary components to the ggplot command. The first is to define the data and the visual aesthetic, and the other defines details of plots, such as font size, background color, axis labels, etc..   
+
+ggplot adds layers. So, for example, you may just start with a simple plot then keep adding different 'layers.'
+
+First, we make a plot between Date and SCL, color-coded by Turtle_ID:
+
+```{r turtlePlot_1, echo=TRUE}
+read.table("data/Growth data Nov 2008 cleaned.csv", 
+           header = TRUE,
+           sep = ",") %>% 
+  mutate(Date = as.Date(Date_Caught, format = '%m/%d/%Y')) %>%
+  na.omit(select(., SCL, Weight, Date, Turtle_ID)) -> all.turtles
+
+p1 <- ggplot(data = all.turtles) +
+  geom_point(aes(x=Date, 
+                 y=SCL,
+                 color = Turtle_ID))
+p1
+```
+
+The legend took over the whole plot! Remove it:
+
+```{r turtllePlot_2, echo=TRUE}
+p1 <- p1 + theme(legend.position = 'none')
+p1
+```
+
+
+We want to connect those dots so we can see how they changed:
+```{r turtlePlot_3, echo=T}
+p2 <- p1 +
+  geom_line(aes(x=Date, 
+                y=SCL,
+                color = Turtle_ID))
+p2
+```
+
+Remove the gray background.
+
+```{r turtlePlot_3a, echo = T}
+p3 <- p2 + theme(panel.background = element_blank())
+p3
+```
+
+Note that you don't have to keep the old plots separately, i.e., p1, p2, and p3. if you wanted to change the axis color and made them thicker:
+
+```{r turtlePlot_4, echo=T}
+p3 <- p3 + theme(axis.line = element_line(color = 'red',
+                                          size = 2))
+p3
+```
+
+And there are many other things you can do with theme():
+```{r turtlePlot_5, echo=T}
+p4 <- p3 + 
+  theme(axis.line.y = element_line(size = 5,
+                                   color = 'gray'),
+        axis.text = element_text(size = 12),
+        axis.text.y = element_text(color = 'green'),
+        axis.ticks = element_line(size = 2),
+        axis.ticks.length=unit(0.8,"cm")) +
+  ylab(expression(SCL^{2})) + # superscript
+  xlab(expression(Date[2]))   # subscript
+
+p4
+```
+
+Note once a plot is replaced with a new one, it's gone. So, it probably is wise to keep a good one; in this case p3.
+
+For publication, you can save a high-quality plot on your hard drive:
+```{r turtlePlot_6, echo=T}
+ggsave(plot = p3,
+       file = 'images/turtle_growth.png',
+       dpi = 600)
+```
+
+Let's look at different kinds of plots. You may want to have whisker plots of different groups. For example, the following plot creates whisker plots of water temperatures in south San Diego Bay when the power plant was in operation. The data file contained daily water temperature at intake and effluent sides. Temperatures were recorded in Fahrenheit, so we need to convert Fahrenheit to Celsius. We will create a function for that. The goal of this exercise is to create a box-and-whisker plot of monthly water temperatures (in Celsius) for intake and effluent.
+
+```{r loadTempData, echo=T}
+rm(list=ls())    # clear the workspace
+library(ggplot2) # load the ggplot2 library
+
+# read the data file 
+data.0 <- read.csv('data/IntakeAndDischargeTemp.csv',
+                   header = T)
+# look at the data file
+head(data.0)
+summary(data.0)
+# you notice that date format looks troublesomee... 
+
+# NA needs to be removed before making the comparison below:
+data.0 <- na.omit(data.0)
+
+# an easy plot using the regular plot() function:
+plot(data.0$Intake, data.0$Discharge)
+
+# removing some outliers by assigning NAs
+data.0[data.0$Discharge < 50 | data.0$Discharge > 104,
+       'Discharge'] <- NA
+
+# then remove rows with NAs
+data.0 <- na.omit(data.0)
+
+# create a new variable Date from the old Date - We wanted to tell R
+# this is actually a date variable, not just a character variable
+# note the lower case y - only two digits in the data file. Also, %b
+# is used to specify the three digit letter code for months; Jan, Dec, etc.
+data.0$Date <- as.Date(data.0$Date,
+                       format = '%d-%b-%y %H:%M:%S')
+
+# Extract just months from the Date variable then convert them 
+# into numbers (as.numeric()). Otherwise, they are two-digit character string,
+# such as 01, 02, ..., 12.  These are not useful in creating the desired plot.
+data.0$Month <- as.numeric(format(as.Date(data.0$Date), '%m'))
+
+# Finally, we make a factor variable out of 'month'. This is needed for 
+# creating box-and-whisker plots.
+data.0$fMonth <- as.factor(data.0$Month)
+
+```
+
+As you can see, some data massaging needs to be done before you can plot or analyze data.  Knowing what you want to do in the analysis/plotting will make you think about how you want to enter data into your spreadsheet.
+
+Next we create a function to convert Fahrenheit to Celsius. A function is defined first by its name; F2C in this case. Then assign the 'meat' to the name.  The first to make sure R knows it is a function; function().  The 'stuff' that goes into the parentheses are the 'stuff' that is used in the calculation inside; F in this case. You provide temperature readings in Fahrenheit, the equation within the function converts them into Celsius, then returns them back:
+```{r F2C_function, echo=T}
+
+F2C <- function(F){
+  C <- (F - 32)*5/9
+  return(C)
+}
+
+# Let's test the function:
+F2C(32)
+F2C(c(45, 89, 92, 102, 120))
+# seems to be working!
+
+```
+
+Within plotting, you can provide functions to transform your data. Please note that because we use the same data frame for all layers in this plot, I declared the data frame in the first call, i.e., ggplot()
+
+```{r boxplot1, echo=T}
+p1 <- ggplot(data = data.0) +
+  geom_boxplot(aes(x = fMonth, 
+                   y = F2C(Intake)),
+               color = 'blue',
+               size = 1.5,
+               alpha = 0.6) +
+  geom_boxplot(aes(x = fMonth, 
+                   y = F2C(Discharge)),
+               color = 'red',
+               size = 1.1,
+               alpha = 0.4) +
+  ylab("Temperature") +
+  xlab("Month")  
+p1
+```
+
+Let's play with theme():
+
+```{r boxplot2, echo=T}
+p1 <- p1 +
+  theme(axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 12))
+p1
+```
+
+If you want to see raw data points, you can add them using geom_point. Notice the layering concept of ggplot2; we created box plots first, then added (layered) scatter plot on top of them.  
+
+```{r boxplot3, echo=T}
+p2 <- p1 +
+  geom_point(aes(x = fMonth, 
+                 y = F2C(Intake)),
+             color = 'blue') + 
+  geom_point(aes(x = fMonth, 
+                 y = F2C(Discharge)),
+             color = 'red')  
+p2
+```
+
+We can add a bit of "jitter" so all data points can show up:
+
+```{r boxplot4, echo=T}
+# Note that I kept the original box plot (p1) separately so that the jittered
+# points are not overlaid on top of the other points from above.
+p2 <- p1 +
+  geom_jitter(aes(x = fMonth, 
+                  y = F2C(Intake)),
+             color = 'blue') + 
+  geom_jitter(aes(x = fMonth, 
+                  y = F2C(Discharge)),
+             color = 'red')
+p2
+```
+
+There are so many other things you can do with ggplot. Google what you want to do and you will find a lot of solutions. 
+
+#Creating Maps
+R can be used to conduct spatial analyses as well as to create maps. In fact, you can use and create GIS layers. I will provide a brief introduction on this topic here. This is, by no means, a comprehensive guide to mapping in R. If you are interested, you can find more resources on the Internet or books. 
+
+For this example, I will use stranding records of leatherback turtles along the west coast of the U.S. These data were collected as part of the stranding network in the area. They are stored in a dedicated database at the Southwest Fishries Science Center. I extracted data from the database (note, SQL databases can be accessed from R using open database connection, a.k.a., ODBC, which eliminates the use of intermediate steps, such as MS Access).  
+
+```{r strandingData, echo=T}
+# clean the workspace
+rm(list=ls())
+
+# bring in necessary libraries - you may need to install the ggmap and
+# viridis libraries - at the console, type install.packages(c('ggmap', 'viridis'))
+# The viridis package is a color pallette library, which is designed to
+# select color schemes that can be visible by color blind people. 
+library(viridis)
+
+# assign the destination to a variable - not necessary in this case but
+# just to show you another way to do the same task:
+infile <- 'data/WC_DC_Strandings_MAR2019.csv'
+
+dat0 <- read.table(infile, sep = ",", header = TRUE) 
+
+# look at the data:
+#head(dat0)  # I commented out this line
+str(dat0)
+
+```
+
+
+```{r}
+summary(dat0)
+```
+
+Create a new factor variable for year, which will be used to change colors in a plot later:
+
+```{r strandingData2, echo=T}
+dat1.dead <- dat0 %>%
+  mutate(yr.fac = factor(Year_Initially_Observed)) %>% 
+  filter(is.na(Alive_Released))
+
+#dat1.dead.CA <- dat1.dead[dat1.dead$STATE == 'CA',]
+# dat1.human <- dat1.dead %>% 
+#   filter(Human_Interaction != "NO") 
+
+summary(dat1.dead)
+
+```
+
+While we have these data, we digress a little from creating maps and look at how we can create a bar graph using the ggplot2 package:
+
+```{r bargraph, echo=T}
+p1 <- ggplot(data = dat1.dead) +
+  geom_bar(aes(x = yr.fac, fill = State)) + 
+  #qplot(yr.fac, data = dat1.fishery, geom = "bar", fill = STATE) + 
+  scale_y_continuous(breaks = seq(0, 12, 1)) +
+  ylab('Counts') + xlab('') + 
+  ggtitle('Stranded leatherback turtles') +
+  theme(axis.text.x = element_text(angle = 90, size = 15, vjust = 0.5))
+
+p1
+```
+
+One thing to point out; seq(0, 12, 1) creates a vector. More explicitly, it can be written as seq(from = 0, to = 12, by = 1). 
+
+Back to creating maps... 
+
+Because the raw data contain so many variables (columns), we clean it up by extracting only necessary variables. I will use pipes in dplyr to string together the steps:
+
+```{r extract_stranding_data, echo=T}
+# first remove the ones that were released alive and records that
+# don't have latitude (they also don't have longitude)
+
+dat1.dead %>% 
+  filter(., !is.na(Latitude)) %>%
+  select(., State, 
+         yr.fac, 
+         Latitude, Longitude) -> dat1
+
+summary(dat1)
+```
+
+Once the data look good, we can start plotting a base map, then overlay the stranding records on top of it. I'm going to ignoer Alaska ones because it is a bit of pain... We fetcth a map from the Internet:
+
+I use the Internet a lot to find GIS files. You can actually find a lot out there... 
+
+First, I get coast line files from here: http://openstreetmapdata.com/data/coastlines or
+https://shoreline.noaa.gov/data/datasheets/medres.html and
+http://datapages.com/gis-map-publishing-program/gis-open-files/global-framework/global-heat-flow-database/shapefiles-list
+https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2016-eng.cfm
+
+https://www.ngdc.noaa.gov/mgg/shorelines/shorelines.html 
+
+```{r, warning=FALSE}
+# First define map limits - to be used later. 
+E.end <- -112
+W.end <- -128
+N.end <- 51
+S.end <- 30
+
+# f is the full resolution - too big and h is high resolution - should be good enough. 
+all.coast <- sp::spTransform(rgdal::readOGR(dsn = "GISfiles/gshhg-shp-2.3.7/GSHHS_shp/h",
+                                            layer = "GSHHS_h_L1",
+                                            verbose = FALSE),
+                             sp::CRS("+proj=longlat +datum=WGS84"))
+
+W.coast <- raster::crop(all.coast, raster::extent(c(W.end, E.end, S.end, N.end)))
+
+W.coast.df <- broom::tidy(W.coast) 
+```
+
+Then the US-Mexico border from here: 
+https://gis.stackexchange.com/questions/153514/us-mexican-border-data
+Note that the USGS link is broken but direct link "here" is available. 
+http://txpub.usgs.gov/BEHI/Data_download/Boundaries_Layers/International_Boundary_shp.zip
+
+```{r}
+US_MX_border <- sp::spTransform(rgdal::readOGR(dsn = "GISfiles/International_Boundary/shp",
+                                               layer = "International_Boundary_Final",
+                                               verbose = FALSE),
+                                sp::CRS("+proj=longlat +datum=WGS84"))
+
+US_MX_border <- raster::crop(US_MX_border, raster::extent(c(W.end, E.end, 30, 35)))
+US_MX_border.df <- broom::tidy(US_MX_border)
+
+```
+
+US-Canada border was obtained from here: 
+https://hifld-geoplatform.opendata.arcgis.com/datasets/canada-and-us-border
+
+```{r, warning=FALSE}
+US_Canada_border <- sp::spTransform(rgdal::readOGR(dsn = "GISfiles/Canada_and_US_Border",
+                                                  layer = "Canada_and_US_Border",
+                                                  verbose = FALSE),
+                                   sp::CRS("+proj=longlat +datum=WGS84"))
+
+US_Canada_border <- raster::crop(US_Canada_border, raster::extent(c(W.end, E.end, 47, 51)))
+US_Canada_border.df <- broom::tidy(US_Canada_border) 
+```
+
+state borders from here: https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html
+
+```{r, warning=FALSE}
+state_border <- sp::spTransform(rgdal::readOGR(dsn = "GISfiles/cb_2017_us_state_500k",
+                                                   layer = "cb_2017_us_state_500k",
+                                                   verbose = FALSE),
+                                    sp::CRS("+proj=longlat +datum=WGS84"))
+
+state_border <- raster::crop(state_border, raster::extent(c(W.end, E.end, 32, 50)))
+state_border.df <- broom::tidy(state_border)
+```
+
+Then put all together:
+
+```{r}
+border.color <- "gray20"
+
+water.color <- "lightblue"
+land.color <- "darkgray"
+
+p1 <- ggplot() + 
+  geom_polygon(data = data.frame(y = c(N.end, S.end, S.end, N.end, N.end),
+                                 x = c(W.end, W.end, E.end, E.end, W.end)),
+               aes(x = x, y = y),
+               fill = water.color,
+               alpha = 0.8) + 
+  geom_polygon(fill = land.color,
+               data = W.coast.df,
+               aes(x=long, y=lat, group = id),
+               alpha = 0.9) +  
+  geom_path(data = US_MX_border.df,
+            aes(x = long, y = lat, group = group),
+            color = border.color,
+            size = 0.5) + 
+  geom_path(data = US_Canada_border.df,
+            aes(x = long, y = lat, group = group),
+            color = border.color,
+            size = 0.5) + #coord_map()
+  geom_path(data = state_border.df,
+            aes(x = long, y = lat, group = group),
+            color = border.color,
+            size = 0.5) + #coord_map()
+  geom_path(data = data.frame(x = c(E.end, E.end), 
+                              y = c(S.end, N.end)),
+            aes(x = x, y = y),
+            color = land.color,
+            size = 1.2) +
+  coord_map() +
+  xlim(c(-128, E.end))+
+  ylab(expression(paste("Latitude (", degree, "N)"))) +
+  xlab(expression(paste("Longitude (", degree, "W)", sep=""))) 
+
+p1
+```
+
+Once we have a base map, we can overlay the stranding locations on it. 
+
+In order to plot strandings in the Southern California area, we subset the data first then plot them on the other base map (southern Calilfornia):
+
+```{r SCBmap, echo=T}
+
+dat1 %>% filter(Latitude <= 50) %>%
+  mutate(Year = yr.fac) -> dat2
+
+p1 <- p1 + 
+  geom_point(data = dat2,
+             aes(x = Longitude, 
+                 y = Latitude,
+                 color = Year)) +
+  scale_color_viridis(discrete = TRUE,
+                      begin = 0.5,
+                      end = 1.0) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle("Leatherback turtle stranding") +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(size = 10,
+                                    hjust = 0.5),
+        legend.text = element_text(size = 8,
+                                   vjust = 0))
+
+
+p1
+```
+
+That is all for now. 
+
+We covered a lot of ground in a very short time period. I know you are a little overwhelmed. But, I suggest using R every day. As we talked about during the workshop, it is like learning a new language - you need to use it often to master it. Fortunately, you will not starve just because you don't know how to say 'food' in this language. Unfortunately, though, R is not as understanding as people - if you provide wrong command, it will tell you it doesn't understand you. Remember to use the correct case - upper and lower cases mean different things. 
+
+If you get stuck, the Internet is your best friend. You will find tons of resources there. But, if you need any personal help, please feel free to contact me. I may not have a correct answer but I can point you in the right direction. 
+
