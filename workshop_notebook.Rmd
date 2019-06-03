@@ -99,7 +99,7 @@ Warning: R help files are not very helpful sometimes. Also, you need to know R t
 #Packages
 One of the strengths of R is the ability to utilize 'packages', or 'libraries.' A package/library is an extra set of functions, code, and data that expands the capability of base R, often written by scientists who needed some functionality that didn't yet exist within R. As of the mid December 2017, there are 11,979 packages on the R website (https://cran.r-project.org/). As of May 28, 2019, there are 14,304 packages.  Back in July 2017, there were 10,975 packages.  So, people are continuously developing packages. Packages are updated often also. These packages range in their topics from statistics, genomics, mapping, time-series analysis, geo-spatial analyses, satellite telemetry analyses, economics, data mining, and many more. The full list of available packages can be found here: https://cran.r-project.org/web/packages/. And... there are other packages that are not included in the website. Packages must be downloaded and installed - they are all free. You have installed "tidyverse" during the initial setup process.  
 
-install.packages("tidyverse")
+install.packages("tidyverse", dependencies=T)
 
 Before using a package, you need to "load" it into your workspace using the "library" command. For example, 
 
