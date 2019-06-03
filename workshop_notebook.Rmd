@@ -146,7 +146,8 @@ eelgrass.color <- "lightgreen"
 box.coords <- data.frame(lon = c(-117.145, -117.09, -117.09, -117.145, -117.145),
                          lat = c(32.665, 32.665, 32.595, 32.595, 32.665))
 
-p.map.1.2008 <- ggplot() + 
+p.map.1.2008 <- 
+  ggplot() + 
   geom_polygon(data = water.df,
                aes(x = long, y = lat, group = group),
                fill = water.color,
@@ -436,10 +437,10 @@ dim(growth_data_clean)
 Let's make sure we are not fooled by R. Make a histogram of SCL and find the smallest values for largeTurtles and datCmCleaned
 
 ```{r summaryPlot1, echo=TRUE}
-hist(largeTurtles$SCL, 
+hist(large.turtles$SCL, 
      xlab = "SCL (cm)", 
      main = "Turtles > 60cm SCL")
-min(largeTurtles$SCL, na.rm=T)
+min(large.turtles$SCL, na.rm=T)
 min(growth_data_clean$SCL, na.rm=T)
 ```
 
@@ -453,9 +454,15 @@ turtle3030 <- subset(growth_data_clean,
 turtle3030
 ```
 
+```{r}
+growth_data_clean %>% filter(Turtle_ID == "3030") -> turtle3030_2
+turtle3030_2
+```
+
+
 Equivalently, but with a few more key strokes:
 ```{r summary11, echo=TRUE}
-turtle3030 <- growth_data_clean[growth_data_clean$Turtle_ID == "3030",]
+turtle3030_2 <- growth_data_clean[growth_data_clean$Turtle_ID == "3030",]
 turtle3030
 ```
 
@@ -464,8 +471,8 @@ Even though "3030" seems like a number, it is stored as a string of characters i
 We can look at how it grew over time. Let's see if we can plot this. Now I'm going to introduce another package, "ggplot2", which has many more functionalities than the plot function in the base R package. 
 
 ```{r plot_turtleGrowth, echo=TRUE}
-library(ggplot2)   # if not installed, install.packages("ggplot2") first. 
-ggplot(data = turtle3030) + 
+#library(ggplot2)   # if not installed, install.packages("ggplot2") first. 
+ggplot(data = turtle3030_2) + 
   geom_point(aes(x = Date_Caught, y = SCL)) + 
   labs(x = "Date", y = "SCL (cm)")
 
@@ -480,11 +487,11 @@ We create a new variable "Date" using the as.Date function.  It requires what ki
 There is a packaged called "lubridate", which makes working with dates and time easier.  
 
 ```{r plot_turtleGrowth2, echo=TRUE}
-library(lubridate)
+#library(lubridate)
 turtle3030$Date <- as.Date(turtle3030$Date_Caught, 
                             format = "%m/%d/%Y")
 ggplot(data = turtle3030) + 
-  geom_point(aes(x = Date, y = SCL)) + 
+  geom_point(aes(x = Date, y = SCL), na.rm = T) + 
   geom_line(aes(x = Date, y = SCL), na.rm = T) + 
   labs(x = "Date", y = "SCL (cm)")
 
@@ -493,10 +500,12 @@ ggplot(data = turtle3030) +
 That looks a lot better! However, you noticed there is a large gap between sometime in 2001 and 2002. What caused that? When you look at the data (turtle3030), you notice there is an NA in SCL for 2/28/2001. Somehow data were not collected on that day! To ignore this, you can interpolate to enter a data point in the missing place or re-define the data frame without the missing data point. I don't like making up data points so I will show you the second option here 
 
 ```{r plot_turtleGrowth3, echo = TRUE}
-turtle3030 <- filter(turtle3030, !is.na(SCL))
+tmp <- filter(turtle3030_2, SCL != "NA")
+
+turtle3030 <- filter(turtle3030_2, !is.na(SCL))
 ggplot(data = turtle3030) + 
   geom_point(aes(x = Date, y = SCL)) + 
-  geom_line(aes(x = Date, y = SCL), na.rm = T) + 
+  geom_line(aes(x = Date, y = SCL)) + 
   labs(x = "Date", y = "SCL (cm)")
 
 ```
@@ -506,15 +515,17 @@ This effectively linearly interpolates data without adding a "point" in the plot
 ```{r plot_turtleGrowth4, echo=TRUE}
 
 # rebuild a data frame for Turtle 3030:
-growth_data_clean %>% subset(Turtle_ID == "3030") %>%
-  mutate(Date = as.Date(Date_Caught, format = "%m/%d/%Y")) -> turtle3030
+growth_data_clean %>% 
+  subset(Turtle_ID == "3030") %>%
+  mutate(Date = as.Date(Date_Caught, 
+                        format = "%m/%d/%Y")) -> turtle3030
 
 # we need to figure out how many days in between each meaasurement:
 turtle3030 <- mutate(turtle3030, NumDays = Date - Date[1])
 
 # Let's go through this one step at a time. First get the SCLs
 known_SCLs <- filter(turtle3030, 
-                     Date == as.Date("2002-03-20") |
+                     Date == "2002-03-20" |
                        Date == as.Date("2001-01-25"))
 
 dif_SCL <- known_SCLs[2, 'SCL'] - known_SCLs[1, "SCL"]
@@ -534,7 +545,7 @@ turtle3030[3, "SCL"  ] <- interp_SCL
 
 ggplot(data = turtle3030) + 
   geom_point(aes(x = Date, y = SCL)) + 
-  geom_line(aes(x = Date, y = SCL), na.rm = T) + 
+  geom_line(aes(x = Date, y = SCL)) + 
   labs(x = "Date", y = "SCL (cm)")
 ```
 
@@ -548,7 +559,9 @@ Using dplyr, we go through data manipulations one step at a time using an operat
 For example, you may be interested in just larger turtles, so we extract large turtles first and then find out how many times each one was caught:
 
 ```{r dplyr_example1, echo=TRUE}
-growth_data_clean %>% filter(., SCL>60) %>% count(., Turtle_ID)
+growth_data_clean %>% 
+  filter(SCL>60) %>% 
+  count(Turtle_ID)
 
 ```
 
@@ -557,7 +570,9 @@ I used a dot in the first input to filter because that's where growth_data_clean
 ```{r dplyr_example1.1, echo=TRUE}
 growth_data_clean %>% filter(SCL>60) %>% count(., Turtle_ID)
 # or 
-growth_data_clean %>% filter(SCL>60) %>% count(Turtle_ID)
+growth_data_clean %>% 
+  filter(SCL>60) %>% 
+  count(Turtle_ID) -> n.caught
 ```
 
 The pipe operator puts the left hand side variable into the first input in the right hand side. The output of filter is now placed into the dot in count. 
@@ -565,13 +580,15 @@ The pipe operator puts the left hand side variable into the first input in the r
 You can store the results into a new variable:
 
 ```{r dplyr_example2, echo=TRUE}
-n_caught1 <- filter(growth_data_clean, SCL>60) %>% count(., Turtle_ID)
+n_caught1 <- filter(growth_data_clean, SCL>60) %>% 
+  count(., Turtle_ID)
 ```
 
 Equivalently, ...
 
 ```{r dplyr_example2.1, echo=TRUE}
 growth_data_clean %>% filter(., SCL>60) %>% count(Turtle_ID) -> n_caught2
+
 ```
 
 However, when you are not using pipes, you cannot omit the first input. For example, filter(SCL>60) would return an error message. Pipes (%>%) connect commands in order that you would run functions separately without leaving intermittent objects or separating them into multiple lines. For example, the previous chunk can be split into three lines:
@@ -687,10 +704,13 @@ As we discussed many times, there are many ways to accomplish one task. The new 
 # one way to assign size classes
 # many ways to do these tasks...
 # Create a new variable Size.Class then assign values accordingly:
-growth_data_clean %>% mutate(Size.Class = if_else(SCL > 90, 3, 
-                                                 if_else(SCL <= 90 & SCL > 60, 2, 1))) -> growth_data_clean
+growth_data_clean %>% 
+  mutate(Size.Class = if_else(SCL > 90, 3, 
+                              if_else(SCL <= 90 & SCL > 60, 2, 1))) -> growth_data_clean
 
 ```
+
+Start here on Tuesday:
 
 Please note the difference between Size.Class and size variables. The former is a numeric vector with 1s, 2s, and 3s, whereas the latter is a factor variable with two levels; 1 and 2. Depending on what you want to do with the size class variable, you have to make it either factor or numeric variable. I know it makes no sense to you now... but just keep in mind (factor vs. numeric).
 
