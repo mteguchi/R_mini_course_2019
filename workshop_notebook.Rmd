@@ -437,10 +437,10 @@ dim(growth_data_clean)
 Let's make sure we are not fooled by R. Make a histogram of SCL and find the smallest values for largeTurtles and datCmCleaned
 
 ```{r summaryPlot1, echo=TRUE}
-hist(large.turtles$SCL, 
+hist(largeTurtles$SCL, 
      xlab = "SCL (cm)", 
      main = "Turtles > 60cm SCL")
-min(large.turtles$SCL, na.rm=T)
+min(largeTurtles$SCL, na.rm=T)
 min(growth_data_clean$SCL, na.rm=T)
 ```
 
@@ -717,9 +717,11 @@ Please note the difference between Size.Class and size variables. The former is 
 If you wanted to compute summary statistics grouped by a variable (e.g., turtle ID), you can do so easily using summarize (or summarise) function in dplyr. You need to group your data frame by a grouping variable (or more than one) first.
 
 ```{r summary_with_groups, echo=TRUE}
-growth_data_clean %>% group_by(Turtle_ID) %>% 
-  summarize(meanSCL = mean(SCL), 
-            meanMass = mean(Weight), 
+
+growth_data_clean %>%   
+  group_by(Turtle_ID) %>%   
+  summarize(meanSCL = mean(SCL, na.rm = T),             
+            meanMass = mean(Weight, na.rm = T), 
             firstSCL = first(SCL), 
             firstMass = first(Weight),
             lastSCL = last(SCL), 
@@ -828,7 +830,7 @@ lm.data$Index <- seq(from = 1, to = nrow(lm.data))
 p5 <- ggplot(data = lm.data) + 
   geom_point(aes(x = Index,
                  y = CooksD)) + 
-  labs(x = "Index", y = "Cook\'s distance")
+  labs(x = "Index", y = "Cook's distance")
 
 p5
 ```
@@ -855,7 +857,7 @@ lm.data$CooksD2 <- cooksD2
 p1 <- ggplot() + 
   geom_point(data = lm.data,
              aes(x = SCL, 
-                 y = Weight, 
+                 y = Weight,
                  color = CooksD)) + 
   labs(x = "SCL (cm)", y = "Mass (kg)") + 
   scale_color_gradient(low = 'blue', high = 'red')
@@ -879,10 +881,11 @@ You may remove one at a time, say the largest Cook's distance until you find dat
 
 ```{r removingOutliers, echo=TRUE}
 # remove the most offensive one
-lm.data %>% filter(., CooksD2 < max(CooksD2)) -> lm.data
+lm.data %>% filter(CooksD2 < max(CooksD2)) -> lm.data
 fit.lm3 <- lm(lnWeight ~ SCL, data = lm.data)
 
 lm.data$yhat <- predict(fit.lm3)
+
 p3 <- ggplot(data = lm.data) + 
   geom_point(aes(x = SCL, 
                  y = lnWeight, 
@@ -895,6 +898,24 @@ p3
 ```
 
 It may be good to go through the same exercise a couple more times to remove a few more offensive data points. Alternatively, using the previous plot, you may exclude all data points with Cook's distance > 0.1. How would you do that? 
+
+```{r}
+lm.data %>% filter(CooksD2 <= 0.1) -> lm.data1
+fit.lm3 <- lm(lnWeight ~ SCL, data = lm.data1)
+
+lm.data1$yhat <- predict(fit.lm3)
+
+p3 <- ggplot(data = lm.data1) + 
+  geom_point(aes(x = SCL, 
+                 y = lnWeight, 
+                 color = CooksD2)) + 
+  geom_line(aes(x = SCL, y = yhat),
+            size = 2) +
+  labs(x = "SCL (cm)", y = "log(Mass (kg))") + 
+  scale_color_gradient(low = 'blue', high = 'red')
+p3
+```
+
 
 There is a package called "outliers" that contains many functions that can be used to identify extreme values. (I have never used it... I probably should.)
 
@@ -983,7 +1004,7 @@ Let's look at different kinds of plots. You may want to have whisker plots of di
 
 ```{r loadTempData, echo=T}
 rm(list=ls())    # clear the workspace
-library(ggplot2) # load the ggplot2 library
+#library(ggplot2) # load the ggplot2 library
 
 # read the data file 
 data.0 <- read.csv('data/IntakeAndDischargeTemp.csv',
@@ -1016,7 +1037,7 @@ data.0$Date <- as.Date(data.0$Date,
 # Extract just months from the Date variable then convert them 
 # into numbers (as.numeric()). Otherwise, they are two-digit character string,
 # such as 01, 02, ..., 12.  These are not useful in creating the desired plot.
-data.0$Month <- as.numeric(format(as.Date(data.0$Date), '%m'))
+data.0$Month <- as.factor(as.numeric(format(as.Date(data.0$Date), '%m')))
 
 # Finally, we make a factor variable out of 'month'. This is needed for 
 # creating box-and-whisker plots.
@@ -1039,18 +1060,24 @@ F2C(32)
 F2C(c(45, 89, 92, 102, 120))
 # seems to be working!
 
+C2F <- function(C){
+  F <- (9/5) * C + 32
+  return(F)
+}
+
+
 ```
 
 Within plotting, you can provide functions to transform your data. Please note that because we use the same data frame for all layers in this plot, I declared the data frame in the first call, i.e., ggplot()
 
 ```{r boxplot1, echo=T}
 p1 <- ggplot(data = data.0) +
-  geom_boxplot(aes(x = fMonth, 
+  geom_boxplot(aes(x = Month, 
                    y = F2C(Intake)),
                color = 'blue',
                size = 1.5,
                alpha = 0.6) +
-  geom_boxplot(aes(x = fMonth, 
+  geom_boxplot(aes(x = Month, 
                    y = F2C(Discharge)),
                color = 'red',
                size = 1.1,
@@ -1064,8 +1091,8 @@ Let's play with theme():
 
 ```{r boxplot2, echo=T}
 p1 <- p1 +
-  theme(axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 12))
+  theme(axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16))
 p1
 ```
 
@@ -1073,10 +1100,10 @@ If you want to see raw data points, you can add them using geom_point. Notice th
 
 ```{r boxplot3, echo=T}
 p2 <- p1 +
-  geom_point(aes(x = fMonth, 
+  geom_point(aes(x = Month, 
                  y = F2C(Intake)),
              color = 'blue') + 
-  geom_point(aes(x = fMonth, 
+  geom_point(aes(x = Month, 
                  y = F2C(Discharge)),
              color = 'red')  
 p2
@@ -1088,10 +1115,10 @@ We can add a bit of "jitter" so all data points can show up:
 # Note that I kept the original box plot (p1) separately so that the jittered
 # points are not overlaid on top of the other points from above.
 p2 <- p1 +
-  geom_jitter(aes(x = fMonth, 
+  geom_jitter(aes(x = Month, 
                   y = F2C(Intake)),
              color = 'blue') + 
-  geom_jitter(aes(x = fMonth, 
+  geom_jitter(aes(x = Month, 
                   y = F2C(Discharge)),
              color = 'red')
 p2
