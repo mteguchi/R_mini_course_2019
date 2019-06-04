@@ -2,9 +2,13 @@
 
 library(ggplot2)
 
-max <- 120
-x <- runif(n = 100, min = 44, max = 115)
+#max <- 120
+set.seed(10)
+x <- runif(n = 10, 
+           min = 44, 
+           max = 115)
 
+set.seed(10)
 y <- 0.96 + 0.04 * x + rnorm(n=length(x), 0, 0.1)
 
 mass <- exp(y)
@@ -12,6 +16,7 @@ df1 <- data.frame(length = x, mass = mass)
 summary(df1)
 
 lm1 <- lm(log(mass) ~ length, data = df1)
+
 summary(lm1)
 df1$predict <- predict(lm1)
 
