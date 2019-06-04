@@ -1,0 +1,20 @@
+# linear regression model 
+model{
+  for (i in 1:n){
+    y[i] ~ dnorm(mu[i], tau)
+    mu[i] <- a + b * x[i] 
+    log.likelihood[i] <- logdensity.norm(y[i], mu[i], tau)
+  }
+
+  # normal distribution in jags and bugs is defined with 
+  # precision, which is the inverse of variance. so take
+  # the square root of the inverse to get sd. 
+  
+  s <- sqrt(1/tau)
+  
+  # these are relatively benign priors for all parameters.
+  a ~ dnorm(0, 0.1)
+  b ~ dnorm(0, 0.1)
+  tau ~ dgamma(1, 0.01)
+}
+
