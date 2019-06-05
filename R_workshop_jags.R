@@ -6,7 +6,7 @@ library(bayesplot)
 library(ggplot2)
 
 set.seed(10)
-x <- runif(n = 10, 
+x <- runif(n = 50, 
            min = 44, 
            max = 115)
 
@@ -17,7 +17,7 @@ mass <- exp(y)
 df1 <- data.frame(length = x, mass = mass)
 summary(df1)
 
-jags.parameters <- c("a", "b", "s", "deviance", "log.likelihood")
+jags.parameters <- c("a", "b", "s") #, "deviance", "log.likelihood")
 
 jags.data <- list(n = nrow(df1),
                   x = df1$length,
@@ -31,10 +31,10 @@ MCMC.n.samples <- 500000
 MCMC.n.burnin <- 350000
 MCMC.n.thin <- 50
 
-MCMC.params <- list(n.chains = 3,
-                    n.samples = 50000,
-                    n.burnin = 10000,
-                    n.thin = 2)
+# MCMC.params <- list(n.chains = 3,
+#                     n.samples = 50000,
+#                     n.burnin = 10000,
+#                     n.thin = 2)
 
 # initialize the model with all other stuff
 
